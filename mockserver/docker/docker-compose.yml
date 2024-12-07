@@ -1,0 +1,15 @@
+services:
+  initial:
+    container_name: mockserver
+    build:
+      dockerfile: docker/.dockerfile
+    working_dir: /development
+    ports:
+      - '8431:8431'
+
+  postgres:
+    container_name: postgresql
+    build:
+      dockerfile: docker/Postgres.Dockerfile
+    ports:
+      - '5432:5432'
