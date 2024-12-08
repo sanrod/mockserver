@@ -156,7 +156,7 @@ public class Client {
             String key = entry.getKey();
             String value = entry.getValue();
 
-            scriptUpdate.append(key).append("=").append(value).append(",");
+            scriptUpdate.append(key).append("=").append("'").append(value).append("'").append(",");
         }
         scriptUpdate.replace(scriptUpdate.lastIndexOf(","), scriptUpdate.length(), "");
         scriptUpdate.append(String.format(" WHERE %s", condition));

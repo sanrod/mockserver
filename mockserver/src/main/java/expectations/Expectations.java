@@ -19,6 +19,14 @@ public final class Expectations {
             {
                 add(new AddShop().createExp());
             }
+
+            {
+                add(new AddGoodsToTheShop().createExp());
+            }
+
+            {
+                add(new RemoveGoodsFromTheShop().createExp());
+            }
         };
 
         return expectations.toArray(Expectation[]::new);

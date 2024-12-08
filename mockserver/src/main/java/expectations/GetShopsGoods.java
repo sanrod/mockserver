@@ -1,6 +1,5 @@
 package expectations;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import expectations.common.Methods;
@@ -11,7 +10,10 @@ import org.mockserver.matchers.TimeToLive;
 import org.mockserver.matchers.Times;
 import org.mockserver.mock.Expectation;
 import org.mockserver.mock.action.ExpectationResponseCallback;
-import org.mockserver.model.*;
+import org.mockserver.model.HttpRequest;
+import org.mockserver.model.HttpResponse;
+import org.mockserver.model.JsonBody;
+import org.mockserver.model.MediaType;
 import utils.postgres.Client;
 
 import java.sql.SQLException;
@@ -52,7 +54,7 @@ public class GetShopsGoods {
             String shopId = httpRequest.getFirstPathParameter("shopId");
             List<Good> goods = null;
             try {
-                goods = getGoods(shopId);
+                goods = new Methods().getGoods(shopId);
             } catch (Exception ex) {
                 message = ErrorMessage.builder()
                         .message(ex.getMessage())
@@ -122,20 +124,6 @@ public class GetShopsGoods {
                     .withBody(jsonBody);
         }
     }
-
-    private static List<Good> getGoods(String id) throws Exception {
-        List<HashMap<String, String>> sqlMessage = Client.select("Shops", String.format("id = %s", id));
-        if (sqlMessage.isEmpty()) {
-            throw new Exception("Shop is not found!");
-        }
-
-        HashMap<String, String> shopInSql = sqlMessage.stream().findFirst().get();
-        String goodsStr = shopInSql.get("goods");
-
-        return new ObjectMapper().readValue(goodsStr, new TypeReference<>() {
-        });
-    }
-
 
     private static HashMap<String, List<HashMap<String, String>>> getInfos(List<Good> goods) throws SQLException {
         HashMap<String, List<HashMap<String, String>>> result = new HashMap<>();
