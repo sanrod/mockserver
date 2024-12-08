@@ -10,7 +10,7 @@ public class Client {
     private static Connection connection;
 
     private static void setUpConnection() throws SQLException {
-        String jdbcUrl = "jdbc:postgresql://localhost:5432/postgres";
+        String jdbcUrl = "jdbc:postgresql://postgres:5432/postgres";
         String username = "postgres";
         String password = "";
 

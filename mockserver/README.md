@@ -68,3 +68,8 @@
       "goodsIds": [11]
       }
    где "goodsIds" - массив id товаров
+
+
+Докер: команду запуска контейнеров исполнять из текущей директории. При первом запуске 
+docker compose -f docker/docker-compose.yml --project-directory ./ build --no-cache   
+При последующих docker compose -f docker/docker-compose.yml --project-directory ./ up

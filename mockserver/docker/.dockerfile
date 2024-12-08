@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM eclipse-temurin:17-jdk-jammy
 
 EXPOSE 8431
 ENV PATH="$PATH:/opt/gradle/gradle-8.8/bin"

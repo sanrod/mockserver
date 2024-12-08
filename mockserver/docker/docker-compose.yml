@@ -1,5 +1,7 @@
 services:
   initial:
+    depends_on:
+      - postgres
     container_name: mockserver
     build:
       dockerfile: docker/.dockerfile
