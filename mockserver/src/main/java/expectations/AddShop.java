@@ -1,22 +1,18 @@
 package expectations;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import expectations.common.Methods;
+import expectations.common.ShopAdder;
+import models.enums.GoodTypes;
 import models.requests.CreateShopRequest;
-import models.shop.Good;
+import models.storage.AddGoodsResult;
 import org.mockserver.matchers.TimeToLive;
 import org.mockserver.matchers.Times;
 import org.mockserver.mock.Expectation;
 import org.mockserver.mock.action.ExpectationResponseCallback;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
-import utils.postgres.Client;
-
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
 
 import static org.mockserver.model.HttpClassCallback.callback;
 import static org.mockserver.model.HttpRequest.request;
@@ -36,47 +32,42 @@ public class AddShop {
     }
 
     public static class TestExpectationResponseCallback implements ExpectationResponseCallback {
-        private static HashMap<String, Boolean> canCreateGoods;
 
         @Override
         public HttpResponse handle(HttpRequest httpRequest) throws Exception {
-            CreateShopRequest request = new ObjectMapper()
-                    .registerModule(new JavaTimeModule())
-                    .readValue(httpRequest.getBodyAsString(), CreateShopRequest.class);
+            CreateShopRequest request;
+            try {
+                request = new ObjectMapper()
+                        .registerModule(new JavaTimeModule())
+                        .readValue(httpRequest.getBodyAsString(), CreateShopRequest.class);
+            } catch (Exception e) {
+                return response()
+                        .withBody("Can't create the shop! The request body is wrong!")
+                        .withStatusCode(500);
+            }
 
-            if (!(new Methods().canCreateShop(request.getShop()))) {
+            ShopAdder adder = new ShopAdder();
+            if (!adder.canCreateShop(request.getShop())) {
                 return response()
                         .withBody("Can't create the shop! Already exists with the same id or name!")
                         .withStatusCode(400);
             }
 
-            canCreateGoods = new Methods().canCreateGoods(request);
-
-            if (!canCreateGoods.get("canCreate")) {
+            GoodTypes type = new Methods().checkGoodsInRequest(request);
+            if (type == GoodTypes.WRONG_TYPE) {
                 return response()
-                        .withBody("Can't create the shop! The goods already exist or there more than one type!")
+                        .withBody("Can't create the shop!There are more than one type of goods or an incorrect type!")
                         .withStatusCode(400);
             }
 
-
             try {
-                createShopAndGoods(request);
-                return response().withStatusCode(201).withBody("The shop created successfully");
+                AddGoodsResult goods = new Methods().transformGoodsToDbFormat(type, request);
+                adder.createShop(request.getShop(), goods.getAdded());
+                return response().withStatusCode(201).withBody(String.format("The shop created successfully! The following " +
+                        "goods were excluded %s", goods.getExcluded()));
             } catch (Exception ex) {
                 return response().withStatusCode(500).withBody(String.format("Something went wrong!\n %s", ex.getMessage()));
             }
-        }
-
-        private static void createShopAndGoods(CreateShopRequest request) throws SQLException, JsonProcessingException {
-            List<Good> goods = new Methods().createGoods(canCreateGoods, request);
-
-            Client.insert("Shops", List.of(
-                    String.valueOf(request.getShop().getId()),
-                    request.getShop().getName(),
-                    new ObjectMapper()
-                            .registerModule(new JavaTimeModule())
-                            .writeValueAsString(request.getShop().getAddress()),
-                    new ObjectMapper().writeValueAsString(goods)));
         }
     }
 }

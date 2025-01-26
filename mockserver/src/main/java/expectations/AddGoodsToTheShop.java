@@ -3,10 +3,12 @@ package expectations;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import expectations.common.Methods;
+import models.enums.GoodTypes;
 import models.requests.AddGoodsRequest;
 import models.requests.CreateShopRequest;
 import models.shop.Good;
 import models.shop.Shop;
+import models.storage.AddGoodsResult;
 import org.mockserver.matchers.TimeToLive;
 import org.mockserver.matchers.Times;
 import org.mockserver.mock.Expectation;
@@ -38,17 +40,27 @@ public class AddGoodsToTheShop {
     public static class TestExpectationResponseCallback implements ExpectationResponseCallback {
         @Override
         public HttpResponse handle(HttpRequest httpRequest) throws Exception {
-            AddGoodsRequest addGoodsRequest = new ObjectMapper()
-                    .registerModule(new JavaTimeModule())
-                    .readValue(httpRequest.getBodyAsString(), AddGoodsRequest.class);
+            AddGoodsRequest addGoodsRequest;
+            try {
+                addGoodsRequest = new ObjectMapper()
+                        .registerModule(new JavaTimeModule())
+                        .readValue(httpRequest.getBodyAsString(), AddGoodsRequest.class);
+            } catch (Exception ex) {
+                return response()
+                        .withStatusCode(400)
+                        .withBody("Wrong body message!");
+            }
+
 
             boolean shopExists = new Methods().checkShopExist(addGoodsRequest.getShopId());
 
             if (!shopExists) {
-                return response().withStatusCode(400).withBody("The shop doesn't exist! You have to create it first.");
+                return response()
+                        .withStatusCode(400)
+                        .withBody("The shop doesn't exist! You have to create it first.");
             }
 
-            HashMap<String, Boolean> canCreateGoods = new Methods().canCreateGoods(CreateShopRequest.builder()
+            CreateShopRequest request = CreateShopRequest.builder()
                     .shop(Shop.builder()
                             .id(Integer.parseInt(addGoodsRequest.getShopId()))
                             .build())
@@ -58,35 +70,32 @@ public class AddGoodsToTheShop {
                     .dogs(addGoodsRequest.getDogs())
                     .foods(addGoodsRequest.getFoods())
                     .toys(addGoodsRequest.getToys())
-                    .build());
+                    .build();
 
-            if (!canCreateGoods.get("canCreate")) {
-                return response().withStatusCode(400).withBody("The goods already exist! You can add only new items.");
+            GoodTypes type = new Methods().checkGoodsInRequest(request);
+            if (type == GoodTypes.WRONG_TYPE) {
+                return response()
+                        .withBody("Can't add the goods to the shop!There are more than one type of goods or" +
+                                " an incorrect type!")
+                        .withStatusCode(400);
             }
-
-            List<Good> goods = new Methods().createGoods(canCreateGoods, CreateShopRequest.builder()
-                    .shop(Shop.builder()
-                            .id(Integer.parseInt(addGoodsRequest.getShopId()))
-                            .build())
-                    .birds(addGoodsRequest.getBirds())
-                    .cars(addGoodsRequest.getCars())
-                    .cats(addGoodsRequest.getCats())
-                    .dogs(addGoodsRequest.getDogs())
-                    .foods(addGoodsRequest.getFoods())
-                    .toys(addGoodsRequest.getToys())
-                    .build());
-
-            List<Good> existingGoods = new Methods().getGoods(addGoodsRequest.getShopId());
-            goods.addAll(existingGoods);
-
-            HashMap<String, String> goodMap = new HashMap<>();
-            goodMap.put("goods", new ObjectMapper().writeValueAsString(goods));
 
             try {
+                AddGoodsResult goods = new Methods().transformGoodsToDbFormat(type, request);
+                List<Good> existingGoods = new Methods().getGoods(addGoodsRequest.getShopId());
+                existingGoods.addAll(goods.getAdded());
+                HashMap<String, String> goodMap = new HashMap<>();
+                goodMap.put("goods", new ObjectMapper().writeValueAsString(existingGoods));
                 Client.updateRow("Shops", String.format("id = %s", addGoodsRequest.getShopId()), goodMap);
-                return response().withStatusCode(201).withBody("The goods added to the shop!");
+                return response()
+                        .withStatusCode(201)
+                        .withBody(String.format("The goods %s added to the shop! The goods %s are excluded",
+                                new ObjectMapper().writeValueAsString(goods.getAdded()),
+                                new ObjectMapper().writeValueAsString(goods.getExcluded())));
             } catch (Exception ex) {
-                return response().withStatusCode(500).withBody(String.format("Something went wrong!\n %s", ex.getMessage()));
+                return response()
+                        .withStatusCode(500)
+                        .withBody(String.format("Something went wrong!\n %s", ex.getMessage()));
             }
         }
     }

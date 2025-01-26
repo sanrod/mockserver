@@ -11,7 +11,6 @@ import lombok.extern.jackson.Jacksonized;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
 @Jacksonized
 public class Cat {
     private int paws;

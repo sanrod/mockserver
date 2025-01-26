@@ -1,4 +1,4 @@
-package models.shop;
+package models.storage;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.jackson.Jacksonized;
+import models.shop.Good;
+
+import java.util.List;
 
 @Builder
 @Getter
@@ -13,6 +16,7 @@ import lombok.extern.jackson.Jacksonized;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Jacksonized
-public class ErrorMessage {
-    String message;
+public class AddGoodsResult {
+    List<String> excluded;
+    List<Good> added;
 }

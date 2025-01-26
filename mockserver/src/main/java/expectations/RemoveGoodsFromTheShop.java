@@ -37,9 +37,17 @@ public class RemoveGoodsFromTheShop {
     public static class TestExpectationResponseCallback implements ExpectationResponseCallback {
         @Override
         public HttpResponse handle(HttpRequest httpRequest) throws Exception {
-            RemoveGoodsRequest removeGoodsRequest = new ObjectMapper()
-                    .registerModule(new JavaTimeModule())
-                    .readValue(httpRequest.getBodyAsString(), RemoveGoodsRequest.class);
+            RemoveGoodsRequest removeGoodsRequest;
+            try {
+                removeGoodsRequest = new ObjectMapper()
+                        .registerModule(new JavaTimeModule())
+                        .readValue(httpRequest.getBodyAsString(), RemoveGoodsRequest.class);
+            } catch (Exception ex) {
+                return response()
+                        .withStatusCode(500)
+                        .withBody(String.format("Something went wrong!\n %s", ex.getMessage()));
+            }
+
 
             boolean shopExists = new Methods().checkShopExist(removeGoodsRequest.getShopId());
 

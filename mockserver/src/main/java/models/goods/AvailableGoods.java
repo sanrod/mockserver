@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.jackson.Jacksonized;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Builder
@@ -17,5 +18,5 @@ import java.util.List;
 @Jacksonized
 public class AvailableGoods {
     private int shopId;
-    private List<?> goods;
+    private List<HashMap<String, String>> goods;
 }

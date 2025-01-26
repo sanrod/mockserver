@@ -10,7 +10,7 @@ public class Client {
     private static Connection connection;
 
     private static void setUpConnection() throws SQLException {
-        String jdbcUrl = "jdbc:postgresql://postgres:5432/postgres";
+        String jdbcUrl = "jdbc:postgresql://postgresql:5432/postgres";
         String username = "postgres";
         String password = "";
 
@@ -37,7 +37,6 @@ public class Client {
 
     private static List<HashMap<String, String>> executeSelect(String script) throws SQLException {
         List<HashMap<String, String>> result = new ArrayList<>();
-//        HashMap<String, String> result = new HashMap<>();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(script);
 
