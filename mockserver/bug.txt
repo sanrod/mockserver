@@ -1,0 +1,33 @@
+01 добавление магазина с кошками выдает ошибку
+входные данные:host localhost:8431   endpoint  addShop . магазина с id 9 не существует,товара (кошки) с id 66 не существует
+шаги 
+1)отправка запроса localhost:8431/addShop в Postman
+2) в тело запроса задать значения 
+{
+    "shop": {
+        "id": 9,
+        "name": "Anna",
+        "address": {
+            "country": "Senegal",
+            "city": "In the middle of nowhere",
+            "street": "asssss",
+            "openDate": "2012-12-12",
+            "closeDate": "2026-12-12"
+        }
+    },
+    "cats": [
+        {
+            "price": "39",
+            "name": "oxi",
+            "carnivore": true,
+            "paws": "3",
+            "crazy": true,
+            "weight": "15",
+            "id": "66"
+        }
+    ]
+}
+
+ожидаемый результат: добавился магазин
+фактический результат Something went wrong!
+ Cannot invoke "java.util.List.iterator()" because "birds" is null

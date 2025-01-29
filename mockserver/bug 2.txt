@@ -1,0 +1,21 @@
+2.0 добавление нового товара в магазин. товар не добавляется
+входные данные:host localhost:8431   endpoint  addGoods . магазина с id 4  существует,товара (кошки) с id 66 не существует. в магазине тип товара животные
+шаги 
+1)отправка запроса localhost:8431/addShop в Postman
+{
+    "shopId": "4",
+    "cats": [
+        {
+            "price": "39",
+            "name": "oxi",
+            "carnivore": true,
+            "paws": "3",
+            "crazy": true,
+            "weight": "15",
+            "id": "66"
+        }
+    ]
+}
+ожидаемый результат. товар дрбавлен в магазин
+фактический результат Something went wrong!
+ Cannot invoke "java.util.List.iterator()" because "birds" is null
