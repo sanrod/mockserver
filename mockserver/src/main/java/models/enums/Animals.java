@@ -5,12 +5,10 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum GoodTypes {
-    ANIMALS("ANIMALS"),
-    TOYS("TOYS"),
-    CARS("CARS"),
-    FOOD("FOOD"),
-    WRONG_TYPE("WRONG_TYPE");
+public enum Animals {
+    CATS("CATS"),
+    DOGS("DOGS"),
+    BIRDS("BIRDS");
 
     private final String name;
 }

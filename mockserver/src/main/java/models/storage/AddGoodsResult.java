@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.jackson.Jacksonized;
 import models.shop.Good;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Builder
@@ -17,6 +18,6 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Jacksonized
 public class AddGoodsResult {
-    List<String> excluded;
-    List<Good> added;
+    List<String> excluded = new ArrayList<>();
+    List<Good> added = new ArrayList<>();
 }

@@ -121,6 +121,8 @@ public class Methods {
                                         good.getType()));
                     }
                 };
+            } else {
+                info.put("type", good.getType());
             }
             result.add(info);
         }
@@ -148,9 +150,21 @@ public class Methods {
             case TOYS -> result = new GoodAdder().addToys(request.getToys());
             case FOOD -> result = new GoodAdder().addAllFood(request.getFoods());
             case ANIMALS -> {
-                AddGoodsResult birds = new GoodAdder().addBirds(request.getBirds());
-                AddGoodsResult cats = new GoodAdder().addCats(request.getCats());
-                AddGoodsResult dogs = new GoodAdder().addDogs(request.getDogs());
+                AddGoodsResult birds = new AddGoodsResult();
+                AddGoodsResult cats = new AddGoodsResult();
+                AddGoodsResult dogs = new AddGoodsResult();
+                try {
+                    birds = new GoodAdder().addBirds(request.getBirds());
+                } catch (Exception ignored) {
+                }
+                try {
+                    cats = new GoodAdder().addCats(request.getCats());
+                } catch (Exception ignored) {
+                }
+                try {
+                    dogs = new GoodAdder().addDogs(request.getDogs());
+                } catch (Exception ignored) {
+                }
 
                 List<Good> added = birds.getAdded();
                 added.addAll(cats.getAdded());
@@ -208,5 +222,51 @@ public class Methods {
             result = GoodTypes.TOYS;
         }
         return result;
+    }
+
+    public HashMap<String, ArrayList<Object>> convertGoodsInfoToDto(List<HashMap<String, String>> info) {
+        HashMap<String, ArrayList<Object>> converted = new HashMap<>();
+        converted.put("cats", new ArrayList<>());
+        converted.put("dogs", new ArrayList<>());
+        converted.put("birds", new ArrayList<>());
+        converted.put("cars", new ArrayList<>());
+        converted.put("food", new ArrayList<>());
+        converted.put("toys", new ArrayList<>());
+        for (HashMap<String, String> map : info) {
+            String type = map.get("type");
+            switch (type.toLowerCase()) {
+                case "cats" -> {
+                    map.remove("type");
+                    Cat cat = new ObjectMapper().registerModule(new JavaTimeModule()).convertValue(map, Cat.class);
+                    converted.get("cats").add(cat);
+                }
+                case "dogs" -> {
+                    map.remove("type");
+                    Dog dog = new ObjectMapper().registerModule(new JavaTimeModule()).convertValue(map, Dog.class);
+                    converted.get("dogs").add(dog);
+                }
+                case "birds" -> {
+                    map.remove("type");
+                    Bird bird = new ObjectMapper().registerModule(new JavaTimeModule()).convertValue(map, Bird.class);
+                    converted.get("birds").add(bird);
+                }
+                case "cars" -> {
+                    map.remove("type");
+                    Car car = new ObjectMapper().registerModule(new JavaTimeModule()).convertValue(map, Car.class);
+                    converted.get("cars").add(car);
+                }
+                case "toys" -> {
+                    map.remove("type");
+                    Toy toy = new ObjectMapper().registerModule(new JavaTimeModule()).convertValue(map, Toy.class);
+                    converted.get("toys").add(toy);
+                }
+                case "foods" -> {
+                    map.remove("type");
+                    Food food = new ObjectMapper().registerModule(new JavaTimeModule()).convertValue(map, Food.class);
+                    converted.get("food").add(food);
+                }
+            }
+        }
+        return converted;
     }
 }

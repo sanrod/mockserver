@@ -10,7 +10,7 @@ public class Client {
     private static Connection connection;
 
     private static void setUpConnection() throws SQLException {
-        String jdbcUrl = "jdbc:postgresql://postgresql:5432/postgres";
+        String jdbcUrl = "jdbc:postgresql://localhost:5432/postgres";
         String username = "postgres";
         String password = "";
 
@@ -46,7 +46,7 @@ public class Client {
         while (resultSet.next()) {
             HashMap<String, String> temp = new HashMap<>();
             for (int i=1; i<=columnCount; i++) {
-                temp.put(rsmd.getColumnName(i), resultSet.getString(i));
+                temp.put(rsmd.getColumnName(i), resultSet.getObject(i).toString());
             }
             result.add(temp);
         }
@@ -60,8 +60,8 @@ public class Client {
         String createTableSQL = "CREATE TABLE Birds ("
                 + "id serial PRIMARY KEY,"
                 + "name VARCHAR(255),"
-                + "canSign BOOLEAN,"
-                + "canSpeak BOOLEAN,"
+                + "\"canSign\" BOOLEAN,"
+                + "\"canSpeak\" BOOLEAN,"
                 + "size VARCHAR(255),"
                 + "price INT)";
         createTable(createTableSQL);
@@ -88,7 +88,7 @@ public class Client {
                 + "paws INT,"
                 + "carnivore BOOLEAN,"
                 + "aggressive BOOLEAN,"
-                + "barkingALot BOOLEAN,"
+                + "\"barkingALot\" BOOLEAN,"
                 + "price INT,"
                 + "weight INT)";
         createTable(createTableSQL);
@@ -99,9 +99,9 @@ public class Client {
         String createTableSQL = "CREATE TABLE Cars ("
                 + "id serial PRIMARY KEY,"
                 + "name VARCHAR(255),"
-                + "sideOfSteeringWheel VARCHAR(255),"
+                + "\"sideOfSteeringWheel\" VARCHAR(255),"
                 + "horsePowers INT,"
-                + "availableSince VARCHAR(255),"
+                + "\"availableSince\" VARCHAR(255),"
                 + "discount INT,"
                 + "price INT"
                 + ")";
@@ -113,9 +113,9 @@ public class Client {
         String createTableSQL = "CREATE TABLE Foods ("
                 + "id serial PRIMARY KEY,"
                 + "name VARCHAR(255),"
-                + "expirationDate VARCHAR(255),"
+                + "\"expirationDate\" VARCHAR(255),"
                 + "calories INT,"
-                + "sugarAmount INT,"
+                + "\"sugarAmount\" INT,"
                 + "fat INT,"
                 + "price INT"
                 + ")";
@@ -127,7 +127,7 @@ public class Client {
         String createTableSQL = "CREATE TABLE Toys ("
                 + "id serial PRIMARY KEY,"
                 + "name VARCHAR(255),"
-                + "forAdults BOOLEAN,"
+                + "\"forAdults\" BOOLEAN,"
                 + "price INT)";
         createTable(createTableSQL);
     }
