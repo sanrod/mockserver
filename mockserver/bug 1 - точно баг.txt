@@ -1,0 +1,23 @@
+01 при добавлении товара в магазин ( собака) выдает ошибку тела запроса
+входные данные:host localhost:8431   endpoint  ddGoods. магазин с id 7 существует,добавлены товары животные ( кошки,собаки,птицы)
+шаги 
+1)отправка запроса localhost:8431/ddGoods
+
+{
+    "shopId": 7,
+    "dogs": [
+        {
+            "price": 82,
+            "name": "ZbtRwrkuzckFvOzFTCgI",
+            "carnivore": false,
+            "paws": 4,
+            "weight": 906,
+            "id": 90,
+            "aggressive": true,
+            "barkingalot": false
+        }
+    ]
+}
+
+ожидаемый результат: добавлен товар в магазин.
+фактический результат Wrong body message!
