@@ -1,5 +1,6 @@
 package expectations;
 
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import expectations.common.Methods;
@@ -44,6 +45,7 @@ public class AddGoodsToTheShop {
             try {
                 addGoodsRequest = new ObjectMapper()
                         .registerModule(new JavaTimeModule())
+                        .configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true)
                         .readValue(httpRequest.getBodyAsString(), AddGoodsRequest.class);
             } catch (Exception ex) {
                 return response()
